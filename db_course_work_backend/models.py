@@ -19,15 +19,15 @@ class PLACE(models.Model):
 
 class EXHIBIT(models.Model):
     NAME = models.CharField(max_length=90, default="МАДОННА С МЛАДЕНЦЕМ")
-    AUTHOR = models.ForeignKey(PERSONAL_DATA, null=False)
+    AUTHOR = models.ForeignKey(PERSONAL_DATA, null=False, on_delete=models.DO_NOTHING)
     DATE_CREATION = models.DateTimeField()
     DIRECTION = models.CharField(max_length=45)
-    LOCATION = models.ForeignKey(PLACE, null=False)
+    LOCATION = models.ForeignKey(PLACE, null=False, on_delete=models.DO_NOTHING)
 
 
 class EXHIBITION(models.Model):
     NAME = models.CharField(max_length=90)
-    OWNER = models.ForeignKey(PERSONAL_DATA, null=True)
+    OWNER = models.ForeignKey(PERSONAL_DATA, null=True, on_delete=models.DO_NOTHING)
     LOCATION = models.ForeignKey(PLACE, null=False, on_delete=models.CASCADE)
     exhibit = models.ManyToManyField(EXHIBIT)
 
@@ -86,8 +86,8 @@ class GROUP(models.Model):
     TIME = models.DateTimeField()
     COST = models.IntegerField()
     NUMBER_SEATS = models.IntegerField()  # TODO CHECK ( КОЛИЧЕСТВО_МЕСТ < 20 )
-    PLACE_GATHERING = models.ForeignKey(PLACE, null=False, on_delete=models.CASCADE)
-    PLACE_TERMINATION = models.ForeignKey(PLACE, null=False, on_delete=models.CASCADE)
+    PLACE_GATHERING = models.ForeignKey(PLACE, related_name="PLACE_GATHERING", null=False, on_delete=models.CASCADE)
+    PLACE_TERMINATION = models.ForeignKey(PLACE, related_name="PLACE_TERMINATION", null=False, on_delete=models.CASCADE)
     excursionist = models.ManyToManyField(EXCURSIONIST)
 
 
