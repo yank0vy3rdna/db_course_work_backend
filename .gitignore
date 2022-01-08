@@ -7,3 +7,5 @@
 backend/__pycache__/
 db_course_work_backend/__pycache__/
 db_course_work_backend/migrations/__pycache__/
+__pycache__/
+db_course_work_backend/migrations/0001_initial.py

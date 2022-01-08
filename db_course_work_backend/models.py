@@ -1,4 +1,5 @@
 from django.db import models
+from django.core.validators import MaxValueValidator
 
 
 # Create your models here.
@@ -8,6 +9,10 @@ class PERSONAL_DATA(models.Model):
     PATRONYMIC = models.CharField(max_length=45)
     GENDER = models.BooleanField(null=False)
     DATE_BIRTHDAY = models.DateTimeField()
+
+    class Meta:
+        verbose_name = 'Personal data'
+        verbose_name_plural = 'Personal data'
 
 
 class PLACE(models.Model):
@@ -66,7 +71,7 @@ class EXCURSION(models.Model):
     NAME = models.CharField(max_length=90)
     DESCRIPTION = models.CharField(max_length=400,
                                    default="Самая незабываемая и интересная экскурсия, которую можно посетить.")
-    DURATION = models.IntegerField(null=False)  # TODO CHECK ( ПРОДОЛЖИТЕЛЬНОСТЬ < 23 )
+    DURATION = models.PositiveIntegerField(default=0, validators=[MaxValueValidator(24)])
     museum = models.ManyToManyField(MUSEUM)
     exhibition = models.ManyToManyField(EXHIBITION)
     exhibit = models.ManyToManyField(EXHIBIT)
@@ -79,13 +84,17 @@ class DOCUMENT_STATUS(models.Model):
     DATE_CANCELLATION = models.DateTimeField()
     excursionist = models.ManyToManyField(EXCURSIONIST)
 
+    class Meta:
+        verbose_name = 'Document status'
+        verbose_name_plural = 'Document status'
+
 
 class GROUP(models.Model):
     EXHIBITION_ID = models.ForeignKey(EXCURSION, null=False, on_delete=models.CASCADE)
     GUIDE = models.ForeignKey(GUIDE, null=False, on_delete=models.CASCADE)
     TIME = models.DateTimeField()
     COST = models.IntegerField()
-    NUMBER_SEATS = models.IntegerField()  # TODO CHECK ( КОЛИЧЕСТВО_МЕСТ < 20 )
+    NUMBER_SEATS = models.PositiveIntegerField(default=0, validators=[MaxValueValidator(21)])
     PLACE_GATHERING = models.ForeignKey(PLACE, related_name="PLACE_GATHERING", null=False, on_delete=models.CASCADE)
     PLACE_TERMINATION = models.ForeignKey(PLACE, related_name="PLACE_TERMINATION", null=False, on_delete=models.CASCADE)
     excursionist = models.ManyToManyField(EXCURSIONIST)
@@ -97,3 +106,7 @@ class DOCUMENT_ACCREDITATION(models.Model):
     DATE_ISSUE = models.DateTimeField()  # TODO CHECK ( ДАТА_ВЫДАЧИ > '2010-01-01' )
     DATE_CANCELLATION = models.DateTimeField()
     guide = models.ManyToManyField(GUIDE)
+
+    class Meta:
+        verbose_name = 'Document accreditation'
+        verbose_name_plural = 'Document accreditation'
