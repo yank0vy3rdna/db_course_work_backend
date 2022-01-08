@@ -50,15 +50,15 @@ class PASSPORT(models.Model):
     NAME = models.CharField(max_length=45)
     PATRONYMIC = models.CharField(max_length=45)
     GENDER = models.BooleanField(null=False)
-    DATE_BIRTHDAY = models.DateTimeField()  # TODO CHECK ( ДАТА_РОЖДЕНИЯ > '1940-01-01' )
+    DATE_BIRTHDAY = models.DateTimeField()
     PASSPORT_ISSUE = models.CharField(max_length=200)
-    DATE_ISSUE = models.DateTimeField()  # TODO CHECK ( ДАТА_ВЫДАЧИ > '1960-01-01' )
+    DATE_ISSUE = models.DateTimeField()
 
 
 class GUIDE(models.Model):
-    MOBILE_NUMBER = models.BigIntegerField(null=False)  # TODO CHECK ( МОБИЛЬНЫЙ_НОМЕР::text ~ '^[0-9]{10}$' )
+    MOBILE_NUMBER = models.BigIntegerField(null=False)
     PASSPORT_ID = models.ForeignKey(PASSPORT, null=False, on_delete=models.CASCADE)
-    EMAIL = models.CharField(max_length=45, unique=True)  # TODO CHECK (ПОЧТА ~ '^\w+@[a-zA-Z_]+?\.[a-zA-Z]{2,3}$')
+    EMAIL = models.CharField(max_length=45, unique=True)
 
 
 class EXCURSIONIST(models.Model):
@@ -80,7 +80,7 @@ class EXCURSION(models.Model):
 class DOCUMENT_STATUS(models.Model):
     INSTITUTION = models.CharField(max_length=180, null=True)
     NAME = models.CharField(max_length=180)
-    DATE_ISSUE = models.DateTimeField()  # TODO CHECK ( ДАТА_ВЫДАЧИ > '1940-01-01' )
+    DATE_ISSUE = models.DateTimeField()
     DATE_CANCELLATION = models.DateTimeField()
     excursionist = models.ManyToManyField(EXCURSIONIST)
 
@@ -103,7 +103,7 @@ class GROUP(models.Model):
 class DOCUMENT_ACCREDITATION(models.Model):
     INSTITUTION = models.CharField(max_length=180, null=True)
     NAME = models.CharField(max_length=180)
-    DATE_ISSUE = models.DateTimeField()  # TODO CHECK ( ДАТА_ВЫДАЧИ > '2010-01-01' )
+    DATE_ISSUE = models.DateTimeField()
     DATE_CANCELLATION = models.DateTimeField()
     guide = models.ManyToManyField(GUIDE)
 

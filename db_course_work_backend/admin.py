@@ -58,6 +58,10 @@ class EXHIBIT(admin.ModelAdmin):
 
     def Location(self, obj):
         return obj.id
+        # return format_html('<a href="{}"> ID: {}</a>',
+        #                    (reverse("db_course_work_backend_exhibit_changelist")),
+        #                    obj.id)
+        # https://pythonist.ru/kastomizacziya-admin-paneli-django/
 
     Location.short_description = "LOCATION"
 
