@@ -1,4 +1,6 @@
 import smtplib
+import json
+from types import SimpleNamespace
 
 # Добавляем необходимые подклассы - MIME-типы
 from email.mime.multipart import MIMEMultipart
@@ -13,7 +15,7 @@ from django.http import HttpResponse, HttpResponseNotFound, HttpResponsePermanen
 # Create your views here.
 
 # Общие функции(без логина)
-
+from django.views.decorators.csrf import csrf_exempt
 
 from db_course_work_backend.models import EXHIBITION, GROUP, PERSONAL_DATA, PLACE, EXHIBIT, MUSEUM, PASSPORT, GUIDE, \
     EXCURSIONIST, EXCURSION, DOCUMENT_STATUS, DOCUMENT_ACCREDITATION
@@ -54,17 +56,18 @@ def view_list_groups_tour(request):
 
 def become_guide(request):
     # Получаем данные
-    mobile_number = request.POST.get("mobile_number")
-    email_guide = request.POST.get("email")
-    series_passport = request.POST.get("series_passport")
-    number_passport = request.POST.get("number_passport")
-    surname = request.POST.get("surname")
-    name = request.POST.get("name")
-    patronymic = request.POST.get("patronymic")
-    gender = request.POST.get("gender")
-    date_birthday = request.POST.get("date_birthday")
-    passport_issue = request.POST.get("passport_issue")
-    date_issue = request.POST.get("date_issue")
+    x = json.loads(request.body, object_hook=lambda d: SimpleNamespace(**d))
+    mobile_number = x.mobile_number
+    email_guide = x.email_guide
+    series_passport = x.series_passport
+    number_passport = x.number_passport
+    surname = x.surname
+    name = x.name
+    patronymic = x.patronymic
+    gender = x.gender
+    date_birthday = x.date_birthday
+    passport_issue = x.passport_issue
+    date_issue = x.date_issue
 
     # Проверяем заполненность полей
     if mobile_number is None or series_passport is None \
@@ -91,11 +94,12 @@ def become_guide(request):
     return HttpResponse(status)
 
 
+@csrf_exempt
 def register_become_random_dick(request):
     # Получаем данные
-    username = request.POST.get("username")
-    password = request.POST.get("password")
-
+    x = json.loads(request.body, object_hook=lambda d: SimpleNamespace(**d))
+    username = x.username
+    password = x.password
     if username is None or password is None:
         return HttpResponseBadRequest("<h2>BROKEN DATA</h2>")
 
