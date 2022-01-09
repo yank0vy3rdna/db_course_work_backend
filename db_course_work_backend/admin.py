@@ -4,6 +4,7 @@ from django.contrib import admin
 from django.utils.html import format_html
 from django.urls import reverse
 from django.utils.http import urlencode
+from django.utils.safestring import mark_safe
 
 from .models import PERSONAL_DATA, PLACE, EXHIBIT, EXHIBITION, MUSEUM, PASSPORT, GUIDE, EXCURSIONIST, EXCURSION, \
     DOCUMENT_STATUS, GROUP, DOCUMENT_ACCREDITATION
@@ -78,7 +79,7 @@ class EXHIBITION(admin.ModelAdmin):
     filter_horizontal = ('exhibit',)
 
     def Owner(self, obj):
-        return obj.id
+        return mark_safe(f"<a href='/admin/db_course_work_backend/personal_data/{obj.id}/change/'>{obj.id}</a>")
 
     Owner.short_description = "OWNER"
 
