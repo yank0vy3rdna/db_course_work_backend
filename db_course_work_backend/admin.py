@@ -1,9 +1,6 @@
 from django.contrib import admin
 
 # Register your models here.
-from django.utils.html import format_html
-from django.urls import reverse
-from django.utils.http import urlencode
 from django.utils.safestring import mark_safe
 
 from .models import PERSONAL_DATA, PLACE, EXHIBIT, EXHIBITION, MUSEUM, PASSPORT, GUIDE, EXCURSIONIST, EXCURSION, \
@@ -17,18 +14,12 @@ class PERSONAL_DATA(admin.ModelAdmin):
                     "NAME",
                     "PATRONYMIC",
                     "GENDER",
-                    "DATE_BIRTHDAY",
-                    "USER_id")
+                    "DATE_BIRTHDAY")
     search_fields = ("id",
                      "SURNAME",
                      "NAME",
                      "PATRONYMIC",
                      "GENDER")
-
-    def USER_id(self, obj):
-        return mark_safe(f"<a href='/admin/auth/user/{obj.USER_ID_id}/change/'>{obj.USER_ID_id}</a>")
-
-    USER_id.short_description = "USER_ID"
 
 
 @admin.register(PLACE)
@@ -155,7 +146,8 @@ class EXCURSIONIST(admin.ModelAdmin):
     list_display = ("id",
                     "Human",
                     "MOBILE_NUMBER",
-                    "EMAIL")
+                    "EMAIL",
+                    "USER_id")
     search_fields = ("id",
                      "MOBILE_NUMBER",
                      "EMAIL",)
@@ -163,7 +155,12 @@ class EXCURSIONIST(admin.ModelAdmin):
     def Human(self, obj):
         return mark_safe(f"<a href='/admin/db_course_work_backend/personal_data/{obj.HUMAN_id}/change/'>{obj.HUMAN_id}</a>")
 
-    Human.short_description = "HUMAN"
+    Human.short_description = "PERSONAL DATA"
+
+    def USER_id(self, obj):
+        return mark_safe(f"<a href='/admin/auth/user/{obj.USER_ID_id}/change/'>{obj.USER_ID_id}</a>")
+
+    USER_id.short_description = "USER ID"
 
 
 @admin.register(EXCURSION)

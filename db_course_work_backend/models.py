@@ -10,7 +10,6 @@ class PERSONAL_DATA(models.Model):
     PATRONYMIC = models.CharField(max_length=45)
     GENDER = models.BooleanField(null=False)
     DATE_BIRTHDAY = models.DateTimeField()
-    USER_ID = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
 
     class Meta:
         verbose_name = 'Personal data'
@@ -65,9 +64,10 @@ class GUIDE(models.Model):
 
 
 class EXCURSIONIST(models.Model):
-    HUMAN = models.ForeignKey(PERSONAL_DATA, null=True, on_delete=models.CASCADE)
+    HUMAN = models.ForeignKey(PERSONAL_DATA, null=False, on_delete=models.CASCADE)
     MOBILE_NUMBER = models.CharField(max_length=45)
     EMAIL = models.CharField(max_length=45)
+    USER_ID = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
 
 
 class EXCURSION(models.Model):

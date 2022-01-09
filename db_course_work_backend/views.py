@@ -100,7 +100,19 @@ def register_become_random_dick(request):
     x = json.loads(request.body, object_hook=lambda d: SimpleNamespace(**d))
     username = x.username
     password = x.password
-    if username is None or password is None:
+    mobile_number = x.mobile_number
+    email = x.email
+    surname = x.surname
+    name = x.name
+    patronymic = x.patronymic
+    gender = x.gender
+    date_birthday = x.date_birthday
+
+    if username is None or password is None \
+            or mobile_number is None or email is None \
+            or surname is None and name is None \
+            and patronymic is None and gender is None \
+            and date_birthday is None:
         return HttpResponseBadRequest("<h2>BROKEN DATA</h2>")
 
     try:
@@ -115,6 +127,10 @@ def register_become_random_dick(request):
     except IntegrityError:
         return HttpResponseBadRequest("<h2>К сожалению проблемы с группой прав для вас</h2>")
 
+    new_personal_data = PERSONAL_DATA.objects.create(SURNAME=surname, NAME=name, PATRONYMIC=patronymic, GENDER=gender,
+                                                     DATE_BIRTHDAY=date_birthday)
+    EXCURSIONIST.objects.create(MOBILE_NUMBER=mobile_number, EMAIL=email, USER_ID_id=new_user.id,
+                                HUMAN_id=new_personal_data.id)
     return HttpResponse('OK')
 
 
@@ -125,6 +141,14 @@ def stub_add_accreditation(request):
 
 # Рандом хуй функции
 def add_to_group(request):
+    # Получаем данные
+    group_id = request.GET.get("group_id")
+    user_id = request.GET.get("user_id")
+
+    if group_id is None or user_id is None:
+        return HttpResponseBadRequest("<h2>BROKEN DATA</h2>")
+
+    #todo
     return HttpResponse('Голые телки и мужики')
 
 
