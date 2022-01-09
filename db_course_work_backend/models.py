@@ -1,4 +1,5 @@
 from django.db import models
+from django.conf import settings
 from django.core.validators import MaxValueValidator
 
 
@@ -9,6 +10,7 @@ class PERSONAL_DATA(models.Model):
     PATRONYMIC = models.CharField(max_length=45)
     GENDER = models.BooleanField(null=False)
     DATE_BIRTHDAY = models.DateTimeField()
+    USER_ID = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
 
     class Meta:
         verbose_name = 'Personal data'
@@ -59,6 +61,7 @@ class GUIDE(models.Model):
     MOBILE_NUMBER = models.BigIntegerField(null=False)
     PASSPORT_ID = models.ForeignKey(PASSPORT, null=False, on_delete=models.CASCADE)
     EMAIL = models.CharField(max_length=45, unique=True)
+    USER_ID = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
 
 
 class EXCURSIONIST(models.Model):

@@ -17,7 +17,8 @@ class PERSONAL_DATA(admin.ModelAdmin):
                     "NAME",
                     "PATRONYMIC",
                     "GENDER",
-                    "DATE_BIRTHDAY")
+                    "DATE_BIRTHDAY",
+                    "USER_ID")
     search_fields = ("id",
                      "SURNAME",
                      "NAME",
@@ -135,7 +136,8 @@ class GUIDE(admin.ModelAdmin):
     list_display = ("id",
                     "MOBILE_NUMBER",
                     "PASSPORT_id",
-                    "EMAIL")
+                    "EMAIL",
+                    "USER_ID")
     search_fields = ("id",
                      "MOBILE_NUMBER",
                      "EMAIL",)

@@ -3,6 +3,8 @@ import smtplib
 # Добавляем необходимые подклассы - MIME-типы
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
+
+from django.contrib.auth.models import User
 from django.db.models import QuerySet
 from django.core.paginator import Paginator
 from django.http import HttpResponse, HttpResponseNotFound, HttpResponsePermanentRedirect
@@ -68,14 +70,7 @@ def become_guide(request):
             or date_birthday is None or passport_issue is None or date_issue is None:
         return HttpResponseNotFound("<h2>BROKEN DATA</h2>")
 
-    mail = "hrkfyr231g12f@mail.ru"
-    password = "PZ81ZVpQT8J1b5set7EQ"
-
-    msg = MIMEMultipart()
-    msg['From'] = mail
-    msg['To'] = mail
-    msg['Subject'] = 'Хочу захватить Казахстан'  # Тема сообщения
-
+    msg_subject = 'Хочу захватить Казахстан'
     body = "mobile_number: " + str(mobile_number) + "\n" + \
            "email" + str(email_guide) + "\n" + \
            "series_passport: " + str(series_passport) + "\n" + \
@@ -87,37 +82,25 @@ def become_guide(request):
            "date_birthday: " + str(date_birthday) + "\n" + \
            "passport_issue: " + str(passport_issue) + "\n" + \
            "date_issue: " + str(date_issue) + "\n"
-    msg.attach(MIMEText(body, 'plain'))
 
-    server = smtplib.SMTP('smtp.mail.ru', 587)
-    server.starttls()
-    server.login(mail, password)
-    server.send_message(msg)
-    server.quit()
+    status = message_email(msg_subject, body)
 
-    return HttpResponse('OK')
+    return HttpResponse(status)
 
 
 def register_become_random_dick(request):
-    return HttpResponse('Голые телки и мужики')
+    # Получаем данные
+    username = request.POST.get("username")
+    password = request.POST.get("password")
 
-
-# Общие функции(с логином)
-def see_list_dudes_from_group(request):
+    new_user = User.objects.create(username='new_user')
+    new_user.set_password('password')
     return HttpResponse('Голые телки и мужики')
 
 
 # Гид функции
-def create_groups(request):
-    return HttpResponse('Голые телки и мужики')
-
-
-def excursions(request):
-    return HttpResponse('Голые телки и мужики')
-
-
 def stub_add_accreditation(request):
-    return HttpResponse('Голые телки и мужики')
+    return add_status_or_accreditation(request)
 
 
 # Рандом хуй функции
@@ -126,7 +109,7 @@ def add_to_group(request):
 
 
 def stub_add_status(request):
-    return HttpResponse('Голые телки и мужики')
+    return add_status_or_accreditation(request)
 
 
 def default_page(request):
@@ -148,3 +131,41 @@ def get_page_object(information_list: QuerySet, size: int, page_number: int):
             page_number = paginator.num_pages
 
     return paginator.get_page(page_number)
+
+
+def message_email(msg_subject: str, body: str):
+    mail = "hrkfyr231g12f@mail.ru"
+    password = "PZ81ZVpQT8J1b5set7EQ"
+
+    msg = MIMEMultipart()
+    msg['From'] = mail
+    msg['To'] = mail
+    msg['Subject'] = msg_subject  # Тема сообщения
+    msg.attach(MIMEText(body, 'plain'))
+
+    server = smtplib.SMTP('smtp.mail.ru', 587)
+    server.starttls()
+    server.login(mail, password)
+    server.send_message(msg)
+    server.quit()
+    return "OK"
+
+
+def add_status_or_accreditation(request):
+    institution = request.GET.get("institution")
+    name = request.GET.get("name")
+    date_issue = request.GET.get("date_issue")
+    date_cancellation = request.GET.get("date_cancellation")
+    if institution is None or name is None \
+            or date_issue is None or date_cancellation is None:
+        return HttpResponseNotFound("<h2>BROKEN DATA</h2>")
+
+    msg_subject = 'Хочу захватить Казахстан cо статусом инвалида'
+    body = "institution: " + str(institution) + "\n" + \
+           "name" + str(name) + "\n" + \
+           "date_issue: " + str(date_issue) + "\n" + \
+           "date_cancellation: " + str(date_cancellation) + "\n"
+
+    status = message_email(msg_subject, body)
+
+    return HttpResponse(status)
