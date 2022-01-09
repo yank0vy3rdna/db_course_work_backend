@@ -93,7 +93,7 @@ class DOCUMENT_STATUS(models.Model):
 
 
 class GROUP(models.Model):
-    EXHIBITION_ID = models.ForeignKey(EXCURSION, null=False, on_delete=models.CASCADE)
+    EXCURSION_ID = models.ForeignKey(EXCURSION, null=False, on_delete=models.CASCADE)
     GUIDE = models.ForeignKey(GUIDE, null=False, on_delete=models.CASCADE)
     TIME = models.DateTimeField()
     COST = models.IntegerField()

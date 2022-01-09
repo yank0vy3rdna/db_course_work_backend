@@ -5,13 +5,16 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
 from django.contrib.auth.models import User
+from django.db import IntegrityError
 from django.db.models import QuerySet
 from django.core.paginator import Paginator
-from django.http import HttpResponse, HttpResponseNotFound, HttpResponsePermanentRedirect
+from django.http import HttpResponse, HttpResponseNotFound, HttpResponsePermanentRedirect, HttpResponseBadRequest
 
 # Create your views here.
 
 # Общие функции(без логина)
+
+
 from db_course_work_backend.models import EXHIBITION, GROUP, PERSONAL_DATA, PLACE, EXHIBIT, MUSEUM, PASSPORT, GUIDE, \
     EXCURSIONIST, EXCURSION, DOCUMENT_STATUS, DOCUMENT_ACCREDITATION
 
@@ -39,7 +42,7 @@ def view_list_groups_tour(request):
     excursions_id = request.GET.get("excursions_id", 1)
 
     # Получаем данные и проверяем на существование
-    group_list = GROUP.objects.get_queryset().filter(EXHIBITION_ID=excursions_id).order_by('id')
+    group_list = GROUP.objects.get_queryset().filter(EXCURSION_ID=excursions_id).order_by('id')
     if not group_list.exists():
         return HttpResponseNotFound("<h2>Not Found GROUP</h2>")
 
@@ -68,7 +71,7 @@ def become_guide(request):
             or number_passport is None or surname is None \
             or name is None or patronymic is None or gender is None \
             or date_birthday is None or passport_issue is None or date_issue is None:
-        return HttpResponseNotFound("<h2>BROKEN DATA</h2>")
+        return HttpResponseBadRequest("<h2>BROKEN DATA</h2>")
 
     msg_subject = 'Хочу захватить Казахстан'
     body = "mobile_number: " + str(mobile_number) + "\n" + \
@@ -93,9 +96,22 @@ def register_become_random_dick(request):
     username = request.POST.get("username")
     password = request.POST.get("password")
 
-    new_user = User.objects.create(username='new_user')
-    new_user.set_password('password')
-    return HttpResponse('Голые телки и мужики')
+    if username is None or password is None:
+        return HttpResponseBadRequest("<h2>BROKEN DATA</h2>")
+
+    try:
+        new_user = User.objects.create_user(username=username)
+        new_user.set_password(str(password))
+        new_user.save()
+    except IntegrityError:
+        return HttpResponseBadRequest("<h2>Пользователь с таким именем уже существует</h2>")
+
+    try:
+        new_user.groups.add(1)
+    except IntegrityError:
+        return HttpResponseBadRequest("<h2>К сожалению проблемы с группой прав для вас</h2>")
+
+    return HttpResponse('OK')
 
 
 # Гид функции
@@ -158,7 +174,7 @@ def add_status_or_accreditation(request):
     date_cancellation = request.GET.get("date_cancellation")
     if institution is None or name is None \
             or date_issue is None or date_cancellation is None:
-        return HttpResponseNotFound("<h2>BROKEN DATA</h2>")
+        return HttpResponseBadRequest("<h2>BROKEN DATA</h2>")
 
     msg_subject = 'Хочу захватить Казахстан cо статусом инвалида'
     body = "institution: " + str(institution) + "\n" + \

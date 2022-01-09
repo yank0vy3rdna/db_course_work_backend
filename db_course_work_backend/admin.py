@@ -199,7 +199,7 @@ class DOCUMENT_STATUS(admin.ModelAdmin):
 @admin.register(GROUP)
 class GROUP(admin.ModelAdmin):
     list_display = ("id",
-                    "EXHIBITION_id",
+                    "EXCURSION_id",
                     "Guide",
                     "TIME",
                     "COST",
@@ -215,10 +215,10 @@ class GROUP(admin.ModelAdmin):
                    'PLACE_TERMINATION',)
     filter_horizontal = ('excursionist',)
 
-    def EXHIBITION_id(self, obj):
-        return mark_safe(f"<a href='/admin/db_course_work_backend/exhibition/{obj.EXHIBITION_ID_id}/change/'>{obj.EXHIBITION_ID_id}</a>")
+    def EXCURSION_id(self, obj):
+        return mark_safe(f"<a href='/admin/db_course_work_backend/exhibition/{obj.EXCURSION_ID_id}/change/'>{obj.EXCURSION_ID_id}</a>")
 
-    EXHIBITION_id.short_description = "EXHIBITION_ID"
+    EXCURSION_id.short_description = "EXCURSION_ID"
 
     def Guide(self, obj):
         return mark_safe(f"<a href='/admin/db_course_work_backend/guide/{obj.GUIDE_id}/change/'>{obj.GUIDE_id}</a>")
