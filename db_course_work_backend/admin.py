@@ -18,12 +18,17 @@ class PERSONAL_DATA(admin.ModelAdmin):
                     "PATRONYMIC",
                     "GENDER",
                     "DATE_BIRTHDAY",
-                    "USER_ID")
+                    "USER_id")
     search_fields = ("id",
                      "SURNAME",
                      "NAME",
                      "PATRONYMIC",
                      "GENDER")
+
+    def USER_id(self, obj):
+        return mark_safe(f"<a href='/admin/auth/user/{obj.USER_ID_id}/change/'>{obj.USER_ID_id}</a>")
+
+    USER_id.short_description = "USER_ID"
 
 
 @admin.register(PLACE)
@@ -38,7 +43,8 @@ class PLACE(admin.ModelAdmin):
                      "CITY",
                      "STREET",
                      "HOUSE")
-    list_filter = ('COUNTRY', 'CITY')
+    list_filter = ('COUNTRY',
+                   'CITY')
 
 
 @admin.register(EXHIBIT)
@@ -54,16 +60,12 @@ class EXHIBIT(admin.ModelAdmin):
     list_filter = ('AUTHOR', 'DATE_CREATION')
 
     def Author(self, obj):
-        return obj.id
+        return mark_safe(f"<a href='/admin/db_course_work_backend/personal_data/{obj.AUTHOR_id}/change/'>{obj.AUTHOR_id}</a>")
 
     Author.short_description = "AUTHOR"
 
     def Location(self, obj):
-        return obj.id
-        # return format_html('<a href="{}"> ID: {}</a>',
-        #                    (reverse("db_course_work_backend_exhibit_changelist")),
-        #                    obj.id)
-        # https://pythonist.ru/kastomizacziya-admin-paneli-django/
+        return mark_safe(f"<a href='/admin/db_course_work_backend/place/{obj.LOCATION_id}/change/'>{obj.LOCATION_id}</a>")
 
     Location.short_description = "LOCATION"
 
@@ -80,12 +82,12 @@ class EXHIBITION(admin.ModelAdmin):
     filter_horizontal = ('exhibit',)
 
     def Owner(self, obj):
-        return mark_safe(f"<a href='/admin/db_course_work_backend/personal_data/{obj.id}/change/'>{obj.id}</a>")
+        return mark_safe(f"<a href='/admin/db_course_work_backend/personal_data/{obj.OWNER_id}/change/'>{obj.OWNER_id}</a>")
 
     Owner.short_description = "OWNER"
 
     def Location(self, obj):
-        return obj.id
+        return mark_safe(f"<a href='/admin/db_course_work_backend/place/{obj.LOCATION_id}/change/'>{obj.LOCATION_id}</a>")
 
     Location.short_description = "LOCATION"
 
@@ -101,7 +103,7 @@ class MUSEUM(admin.ModelAdmin):
     filter_horizontal = ('exhibition',)
 
     def Location(self, obj):
-        return obj.id
+        return mark_safe(f"<a href='/admin/db_course_work_backend/place/{obj.LOCATION_id}/change/'>{obj.LOCATION_id}</a>")
 
     Location.short_description = "LOCATION"
 
@@ -143,7 +145,7 @@ class GUIDE(admin.ModelAdmin):
                      "EMAIL",)
 
     def PASSPORT_id(self, obj):
-        return obj.id
+        return mark_safe(f"<a href='/admin/db_course_work_backend/passport/{obj.PASSPORT_ID_id}/change/'>{obj.PASSPORT_ID_id}</a>")
 
     PASSPORT_id.short_description = "PASSPORT_ID"
 
@@ -159,7 +161,7 @@ class EXCURSIONIST(admin.ModelAdmin):
                      "EMAIL",)
 
     def Human(self, obj):
-        return obj.id
+        return mark_safe(f"<a href='/admin/db_course_work_backend/personal_data/{obj.HUMAN_id}/change/'>{obj.HUMAN_id}</a>")
 
     Human.short_description = "HUMAN"
 
@@ -214,22 +216,22 @@ class GROUP(admin.ModelAdmin):
     filter_horizontal = ('excursionist',)
 
     def EXHIBITION_id(self, obj):
-        return obj.id
+        return mark_safe(f"<a href='/admin/db_course_work_backend/exhibition/{obj.EXHIBITION_ID_id}/change/'>{obj.EXHIBITION_ID_id}</a>")
 
     EXHIBITION_id.short_description = "EXHIBITION_ID"
 
     def Guide(self, obj):
-        return obj.id
+        return mark_safe(f"<a href='/admin/db_course_work_backend/guide/{obj.GUIDE_id}/change/'>{obj.GUIDE_id}</a>")
 
     Guide.short_description = "GUIDE"
 
     def Place_gathering(self, obj):
-        return obj.id
+        return mark_safe(f"<a href='/admin/db_course_work_backend/place/{obj.PLACE_GATHERING_id}/change/'>{obj.PLACE_GATHERING_id}</a>")
 
     Place_gathering.short_description = "PLACE_GATHERING"
 
     def Place_termination(self, obj):
-        return obj.id
+        return mark_safe(f"<a href='/admin/db_course_work_backend/place/{obj.PLACE_TERMINATION_id}/change/'>{obj.PLACE_TERMINATION_id}</a>")
 
     Place_termination.short_description = "PLACE_TERMINATION"
 
