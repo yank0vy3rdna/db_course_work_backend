@@ -19,5 +19,9 @@ from db_course_work_backend import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', views.view_list_excursions),
+    path('guide/', admin.site.urls),
+    path('excursions/', views.view_list_excursions),
+    path('groups/', views.view_list_groups_tour),
+    path('cg/', views.become_guide),
+    path('', views.default_page),
 ]
