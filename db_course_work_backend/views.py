@@ -142,14 +142,16 @@ def stub_add_accreditation(request):
 # Рандом хуй функции
 def add_to_group(request):
     # Получаем данные
-    group_id = request.GET.get("group_id")
-    user_id = request.GET.get("user_id")
+    group_id = request.GET.get("group_id", 1)
+    user_id = request.GET.get("user_id", 4)
 
     if group_id is None or user_id is None:
         return HttpResponseBadRequest("<h2>BROKEN DATA</h2>")
 
-    #todo
-    return HttpResponse('Голые телки и мужики')
+    group = GROUP.objects.get(id=group_id)
+    group.excursionist.add(user_id)
+
+    return HttpResponse('OK')
 
 
 def stub_add_status(request):
