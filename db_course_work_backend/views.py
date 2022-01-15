@@ -54,17 +54,14 @@ def view_excursion(request):
     museums_list = []
     for museum in museums:
         museums_list.append(museum.NAME)
-    museums_list_json = json.dumps(museums_list)
 
     expositions_list = []
     for exposition in expositions:
         expositions_list.append(exposition.NAME)
-    expositions_list_json = json.dumps(expositions_list)
 
     exhibits_list = []
     for exhibit in exhibits:
         exhibits_list.append(exhibit.NAME)
-    exhibits_list_json = json.dumps(exhibits_list, ensure_ascii=False)
 
     fio = groups[0].GUIDE.PASSPORT_ID.SURNAME + " " + groups[0].GUIDE.PASSPORT_ID.NAME + " " + groups[
         0].GUIDE.PASSPORT_ID.PATRONYMIC
@@ -79,12 +76,11 @@ def view_excursion(request):
                             'place_from': place_from, 'place_to': place_to}
 
         group_list.append(group_dictionary)
-    group_list_json = json.dumps(group_list)
 
     response = json.dumps(
-        {'name': exhibition[0].NAME, 'description': exhibition[0].DESCRIPTION, 'museums': museums_list_json,
-         'expositions': expositions_list_json, 'exhibits': exhibits_list_json,
-         'person': {'fio': fio, 'id': groups[0].GUIDE.id}, 'groups': group_list_json})
+        {'name': exhibition[0].NAME, 'description': exhibition[0].DESCRIPTION, 'museums': museums_list,
+         'expositions': expositions_list, 'exhibits': exhibits_list,
+         'person': {'fio': fio, 'id': groups[0].GUIDE.id}, 'groups': group_list}, ensure_ascii=False)
 
     return HttpResponse(response)
 
