@@ -158,7 +158,7 @@ def stub_add_accreditation(request):
 def add_to_group(request):
     # Получаем данные
     group_id = request.GET.get("group_id", 1)
-    user_id = request.GET.get("user_id", 4)
+    user_id = request.user.id
 
     if group_id is None or user_id is None:
         return HttpResponseBadRequest("<h2>BROKEN DATA</h2>")
@@ -167,6 +167,20 @@ def add_to_group(request):
     group.excursionist.add(user_id)
 
     return HttpResponse('OK')
+
+
+def checkgroup(request):
+    # Получаем данные
+    user_id = request.user.id
+    groups = GROUP.objects.all()
+    group_list = []
+    for group in groups:
+        for excursionist in group.excursionist.all():
+            if excursionist.id == user_id:
+                group_list.append(group.EXCURSION_ID.NAME)
+    response = json.dumps(group_list)
+
+    return HttpResponse(response)
 
 
 def stub_add_status(request):

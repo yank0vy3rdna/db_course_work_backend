@@ -34,5 +34,6 @@ urlpatterns = [
     path('cg/', views.become_guide),
     path('crd/', views.register_become_random_dick),
     path('add/', views.add_to_group),
+    path('checkgroup/', views.checkgroup),
     path('', views.default_page),
 ]
