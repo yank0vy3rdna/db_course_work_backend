@@ -27,14 +27,66 @@ def view_list_excursions(request):
     page_number = request.GET.get("page", 1)
 
     # Получаем данные и проверяем на существование
-    exhibition_list = EXHIBITION.objects.get_queryset().order_by('id')
+    exhibition_list = EXCURSION.objects.get_queryset().order_by('id')
     if not exhibition_list.exists():
-        return HttpResponseNotFound("<h2>Not Found EXHIBIT</h2>")
+        return HttpResponseNotFound("<h2>Not Found EXHIBITS</h2>")
 
     # Получение определенной страницы с данными
     page_obj = get_page_object(exhibition_list, size, page_number)
 
     return HttpResponse(page_obj)
+
+
+def view_excursion(request):
+    # Получаем данные
+    id = request.GET.get("id", 1)
+
+    # Получаем данные и проверяем на существование
+    exhibition = EXCURSION.objects.filter(id=id)
+    museums = exhibition[0].museum.all()
+    expositions = exhibition[0].exhibition.all()
+    exhibits = exhibition[0].exhibit.all()
+    groups = GROUP.objects.filter(EXCURSION_ID=exhibition[0].id)
+
+    if not exhibition.exists():
+        return HttpResponseNotFound("<h2>Not Found EXHIBIT</h2>")
+
+    museums_list = []
+    for museum in museums:
+        museums_list.append(museum.NAME)
+    museums_list_json = json.dumps(museums_list)
+
+    expositions_list = []
+    for exposition in expositions:
+        expositions_list.append(exposition.NAME)
+    expositions_list_json = json.dumps(expositions_list)
+
+    exhibits_list = []
+    for exhibit in exhibits:
+        exhibits_list.append(exhibit.NAME)
+    exhibits_list_json = json.dumps(exhibits_list, ensure_ascii=False)
+
+    fio = groups[0].GUIDE.PASSPORT_ID.SURNAME + " " + groups[0].GUIDE.PASSPORT_ID.NAME + " " + groups[
+        0].GUIDE.PASSPORT_ID.PATRONYMIC
+
+    group_list = []
+    for group in groups:
+        place_from = str(group.PLACE_GATHERING.COUNTRY) + " " + str(group.PLACE_GATHERING.CITY) + " " + str(
+            group.PLACE_GATHERING.STREET) + " " + str(group.PLACE_GATHERING.HOUSE)
+        place_to = str(group.PLACE_TERMINATION.COUNTRY) + " " + str(group.PLACE_TERMINATION.CITY) + " " + str(
+            group.PLACE_TERMINATION.STREET) + " " + str(group.PLACE_TERMINATION.HOUSE)
+        group_dictionary = {'date': str(group.TIME), 'free_slots': group.NUMBER_SEATS, 'id': group.id,
+                            'place_from': place_from, 'place_to': place_to}
+
+        group_list.append(group_dictionary)
+    group_list_json = json.dumps(group_list)
+
+    response = json.dumps(
+        {'name': exhibition[0].NAME, 'description': exhibition[0].DESCRIPTION, 'museums': museums_list_json,
+         'expositions': expositions_list_json, 'exhibits': exhibits_list_json,
+         'person': {'fio': fio, 'id': groups[0].GUIDE.id}, 'groups': group_list_json})
+
+    return HttpResponse(response)
 
 
 def view_list_groups_tour(request):
