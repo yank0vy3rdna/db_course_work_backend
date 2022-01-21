@@ -5,6 +5,7 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from types import SimpleNamespace
 
+from django.contrib.auth import authenticate, login
 from django.contrib.auth.models import User
 from django.core.paginator import Paginator
 from django.db import IntegrityError
@@ -103,7 +104,7 @@ def register_become_random_dick(request):
         return HttpResponseBadRequest("<h2>Пользователь с таким именем уже существует</h2>")
 
     try:
-        new_user.groups.add(1)
+        new_user.groups.add(3)
     except IntegrityError:
         return HttpResponseBadRequest("<h2>К сожалению проблемы с группой прав для вас</h2>")
 
@@ -111,6 +112,10 @@ def register_become_random_dick(request):
                                                      DATE_BIRTHDAY=date_birthday)
     EXCURSIONIST.objects.create(MOBILE_NUMBER=mobile_number, EMAIL=email, USER_ID_id=new_user.id,
                                 HUMAN_id=new_personal_data.id)
+
+    user = authenticate(username=username, password=password)
+    login(request, user)
+
     return HttpResponse('OK')
 
 

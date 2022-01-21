@@ -8,7 +8,7 @@ python manage.py runserver
 python manage.py createsuperuser
 
 #### Аккаунты:
-логин:      пароль:         значение:
-admin       1               superuser
-andrey      khmblfjhhlhl    guide
-user_1      qwertasdf       user
+логин:      пароль:                 значение:
+admin       1                       superuser
+andrey      khmblfjhhlhl            guide
+user_4      fgGjkk3429dsfjm43       user    
