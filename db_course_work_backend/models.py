@@ -30,6 +30,9 @@ class EXHIBIT(models.Model):
     DIRECTION = models.CharField(max_length=45)
     LOCATION = models.ForeignKey(PLACE, null=False, on_delete=models.DO_NOTHING)
 
+    def __str__(self):
+        return self.NAME
+
 
 class EXHIBITION(models.Model):
     NAME = models.CharField(max_length=90)
@@ -37,11 +40,17 @@ class EXHIBITION(models.Model):
     LOCATION = models.ForeignKey(PLACE, null=False, on_delete=models.CASCADE)
     exhibit = models.ManyToManyField(EXHIBIT)
 
+    def __str__(self):
+        return self.NAME
+
 
 class MUSEUM(models.Model):
     NAME = models.CharField(max_length=90)
     LOCATION = models.ForeignKey(PLACE, null=False, on_delete=models.CASCADE)
     exhibition = models.ManyToManyField(EXHIBITION)
+
+    def __str__(self):
+        return self.NAME
 
 
 class PASSPORT(models.Model):

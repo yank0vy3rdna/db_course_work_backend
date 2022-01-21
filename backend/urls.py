@@ -23,17 +23,15 @@ from rest_framework_simplejwt.views import (
 )
 
 urlpatterns = [
-    path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
-    path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
-    path('api/token/verify/', TokenVerifyView.as_view(), name='token_verify'),
+    path('token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    path('token/verify/', TokenVerifyView.as_view(), name='token_verify'),
     path('admin/', admin.site.urls),
     path('guide/', admin.site.urls),
-    path('excursions/', views.view_list_excursions),
-    path('excursion/', views.view_excursion),
-    path('groups/', views.view_list_groups_tour),
+    path('excursions/', views.ExcursionListView.as_view()),
+    path('excursions/<int:pk>', views.ExcursionView.as_view()),
     path('cg/', views.become_guide),
     path('crd/', views.register_become_random_dick),
     path('add/', views.add_to_group),
     path('checkgroup/', views.checkgroup),
-    path('', views.default_page),
 ]

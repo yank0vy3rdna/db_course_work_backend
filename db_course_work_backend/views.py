@@ -1,72 +1,37 @@
-import smtplib
 import json
-from types import SimpleNamespace
-
+import smtplib
 # Добавляем необходимые подклассы - MIME-типы
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
+from types import SimpleNamespace
 
 from django.contrib.auth.models import User
+from django.core.paginator import Paginator
 from django.db import IntegrityError
 from django.db.models import QuerySet
-from django.core.paginator import Paginator
-from django.http import HttpResponse, HttpResponseNotFound, HttpResponsePermanentRedirect, HttpResponseBadRequest
-
-# Create your views here.
-
+from django.http import HttpResponse, HttpResponsePermanentRedirect, HttpResponseBadRequest
 # Общие функции(без логина)
 from django.views.decorators.csrf import csrf_exempt
+from rest_framework.decorators import permission_classes
+from rest_framework.generics import ListAPIView, RetrieveAPIView
+from rest_framework.permissions import IsAuthenticated
 
-from db_course_work_backend.models import EXHIBITION, GROUP, PERSONAL_DATA, PLACE, EXHIBIT, MUSEUM, PASSPORT, GUIDE, \
-    EXCURSIONIST, EXCURSION, DOCUMENT_STATUS, DOCUMENT_ACCREDITATION
-
-
-def view_list_excursions(request):
-    # Получаем данные
-    size = request.GET.get("size", 15)
-    page_number = request.GET.get("page", 1)
-
-    # Получаем данные и проверяем на существование
-    exhibition_list = EXCURSION.objects.get_queryset().order_by('id')
-    if not exhibition_list.exists():
-        return HttpResponseNotFound("<h2>Not Found EXHIBITS</h2>")
-
-    # Получение определенной страницы с данными
-    page_obj = get_page_object(exhibition_list, size, page_number)
-    resp_list = []
-    for num in range(0, len(page_obj.object_list)):
-        resp = return_json(page_obj.object_list[num].id)
-        if not (
-                resp == "<h2>Not Found EXCURSION</h2>" or resp == "<h2>Not Found Group With This EXCURSION</h2>"):
-            resp_list.append(json.loads(resp))
-    response = json.dumps(resp_list)
-    return HttpResponse(response)
+from db_course_work_backend.models import GROUP, PERSONAL_DATA, EXCURSIONIST, EXCURSION
+from db_course_work_backend.serializers import SmallExcursionSerializer, FullExcursionSerializer
 
 
-def view_excursion(request):
-    # Получаем данные
-    id = request.GET.get("id", 2)
-    response = return_json(id)
-    if response == "<h2>Not Found EXCURSION</h2>" or response == "<h2>Not Found Group With This EXCURSION</h2>":
-        return HttpResponseNotFound(response)
-    return HttpResponse(response)
+class ExcursionListView(ListAPIView):
+    authentication_classes = []
+    permission_classes = []
+    queryset = EXCURSION.objects.all()
+    serializer_class = SmallExcursionSerializer
 
 
-def view_list_groups_tour(request):
-    # Получаем данные
-    size = request.GET.get("size", 15)
-    page_number = request.GET.get("page", 1)
-    excursions_id = request.GET.get("excursions_id", 1)
-
-    # Получаем данные и проверяем на существование
-    group_list = GROUP.objects.get_queryset().filter(EXCURSION_ID=excursions_id).order_by('TIME')
-    if not group_list.exists():
-        return HttpResponseNotFound("<h2>Not Found GROUP</h2>")
-
-    # Получение определенной страницы с данными
-    page_obj = get_page_object(group_list, size, page_number)
-
-    return HttpResponse(page_obj)
+class ExcursionView(RetrieveAPIView):
+    authentication_classes = []
+    permission_classes = []
+    queryset = EXCURSION.objects.all()
+    serializer_class = FullExcursionSerializer
 
 
 def become_guide(request):
@@ -164,7 +129,8 @@ def add_to_group(request):
         return HttpResponseBadRequest("<h2>BROKEN DATA</h2>")
 
     group = GROUP.objects.get(id=group_id)
-    group.excursionist.add(user_id)
+    excursionist = EXCURSIONIST.objects.get(USER_ID_id=user_id)
+    group.excursionist.add(excursionist)
 
     return HttpResponse('OK')
 
@@ -185,10 +151,6 @@ def checkgroup(request):
 
 def stub_add_status(request):
     return add_status_or_accreditation(request)
-
-
-def default_page(request):
-    return HttpResponsePermanentRedirect("/excursions")
 
 
 def get_page_object(information_list: QuerySet, size: int, page_number: int):
