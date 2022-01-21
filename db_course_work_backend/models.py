@@ -9,7 +9,7 @@ class PERSONAL_DATA(models.Model):
     NAME = models.CharField(max_length=45)
     PATRONYMIC = models.CharField(max_length=45)
     GENDER = models.BooleanField(null=False)
-    DATE_BIRTHDAY = models.DateTimeField()
+    DATE_BIRTHDAY = models.DateField()
 
     class Meta:
         verbose_name = 'Personal data'

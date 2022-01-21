@@ -12,13 +12,15 @@ from django.db import IntegrityError
 from django.db.models import QuerySet
 from django.http import HttpResponse, HttpResponsePermanentRedirect, HttpResponseBadRequest
 # Общие функции(без логина)
+from django.views import View
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.decorators import permission_classes
 from rest_framework.generics import ListAPIView, RetrieveAPIView
 from rest_framework.permissions import IsAuthenticated
+from rest_framework_simplejwt.authentication import JWTAuthentication
 
 from db_course_work_backend.models import GROUP, PERSONAL_DATA, EXCURSIONIST, EXCURSION
-from db_course_work_backend.serializers import SmallExcursionSerializer, FullExcursionSerializer
+from db_course_work_backend.serializers import SmallExcursionSerializer, FullExcursionSerializer, GroupSerializer
 
 
 class ExcursionListView(ListAPIView):
@@ -113,9 +115,6 @@ def register_become_random_dick(request):
     EXCURSIONIST.objects.create(MOBILE_NUMBER=mobile_number, EMAIL=email, USER_ID_id=new_user.id,
                                 HUMAN_id=new_personal_data.id)
 
-    user = authenticate(username=username, password=password)
-    login(request, user)
-
     return HttpResponse('OK')
 
 
@@ -124,34 +123,38 @@ def stub_add_accreditation(request):
     return add_status_or_accreditation(request)
 
 
-# Рандом хуй функции
-def add_to_group(request):
-    # Получаем данные
-    group_id = request.GET.get("group_id", 1)
-    user_id = request.user.id
+class AddToGroupView(View):
+    login_required = True
+    permission_classes = [IsAuthenticated]
 
-    if group_id is None or user_id is None:
-        return HttpResponseBadRequest("<h2>BROKEN DATA</h2>")
+    def post(self, request):
+        user, _ = JWTAuthentication().authenticate(request)
+        if not user.is_authenticated:
+            return HttpResponse('Unauthorized', status=401)
+        group_id = request.GET.get("group_id", 1)
+        user_id = user.id
 
-    group = GROUP.objects.get(id=group_id)
-    excursionist = EXCURSIONIST.objects.get(USER_ID_id=user_id)
-    group.excursionist.add(excursionist)
+        if group_id is None or user_id is None:
+            return HttpResponseBadRequest("<h2>BROKEN DATA</h2>")
 
-    return HttpResponse('OK')
+        group = GROUP.objects.get(id=group_id)
+        excursionist = EXCURSIONIST.objects.get(USER_ID_id=user_id)
+        if not group.excursionist.contains(excursionist):
+            group.excursionist.add(excursionist)
+        else:
+            return HttpResponse("Already exists")
+        return HttpResponse('OK')
 
 
-def checkgroup(request):
-    # Получаем данные
-    user_id = request.user.id
-    groups = GROUP.objects.all()
-    group_list = []
-    for group in groups:
-        for excursionist in group.excursionist.all():
-            if excursionist.id == user_id:
-                group_list.append(group.EXCURSION_ID.NAME)
-    response = json.dumps(group_list)
+class CheckgroupView(ListAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = GroupSerializer
 
-    return HttpResponse(response)
+    def get_queryset(self):
+        user, _ = JWTAuthentication().authenticate(self.request)
+        if not user.is_authenticated:
+            return None
+        return GROUP.objects.get_queryset().filter(excursionist__USER_ID_id=user)
 
 
 def stub_add_status(request):
@@ -211,50 +214,3 @@ def add_status_or_accreditation(request):
     status = message_email(msg_subject, body)
 
     return HttpResponse(status)
-
-
-def return_json(id: int):
-    # Получаем данные и проверяем на существование
-    exhibition = EXCURSION.objects.filter(id=id)
-    museums = exhibition[0].museum.all()
-    expositions = exhibition[0].exhibition.all()
-    exhibits = exhibition[0].exhibit.all()
-    groups = GROUP.objects.filter(EXCURSION_ID=exhibition[0].id)
-
-    if not exhibition.exists():
-        return "<h2>Not Found EXCURSION</h2>"
-
-    if not groups.exists():
-        return "<h2>Not Found Group With This EXCURSION</h2>"
-
-    museums_list = []
-    for museum in museums:
-        museums_list.append(museum.NAME)
-
-    expositions_list = []
-    for exposition in expositions:
-        expositions_list.append(exposition.NAME)
-
-    exhibits_list = []
-    for exhibit in exhibits:
-        exhibits_list.append(exhibit.NAME)
-
-    fio = groups[0].GUIDE.PASSPORT_ID.SURNAME + " " + groups[0].GUIDE.PASSPORT_ID.NAME + " " + groups[
-        0].GUIDE.PASSPORT_ID.PATRONYMIC
-
-    group_list = []
-    for group in groups:
-        place_from = str(group.PLACE_GATHERING.COUNTRY) + " " + str(group.PLACE_GATHERING.CITY) + " " + str(
-            group.PLACE_GATHERING.STREET) + " " + str(group.PLACE_GATHERING.HOUSE)
-        place_to = str(group.PLACE_TERMINATION.COUNTRY) + " " + str(group.PLACE_TERMINATION.CITY) + " " + str(
-            group.PLACE_TERMINATION.STREET) + " " + str(group.PLACE_TERMINATION.HOUSE)
-        group_dictionary = {'date': str(group.TIME), 'free_slots': group.NUMBER_SEATS, 'id': group.id,
-                            'place_from': place_from, 'place_to': place_to}
-
-        group_list.append(group_dictionary)
-
-    response = json.dumps(
-        {'name': exhibition[0].NAME, 'description': exhibition[0].DESCRIPTION, 'museums': museums_list,
-         'expositions': expositions_list, 'exhibits': exhibits_list,
-         'person': {'fio': fio, 'id': groups[0].GUIDE.id}, 'groups': group_list}, ensure_ascii=False)
-    return response
